@@ -1,0 +1,141 @@
+{
+  "generated_at": "2026-09-24T06:17:19.993029+00:00",
+  "cases": [
+    {
+      "case": "layered_app",
+      "metrics": [
+        {
+          "name": "architecture_dependency",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "accuracy": null,
+          "detail": {
+            "tp": 4,
+            "fp": 0,
+            "fn": 0,
+            "expected": 4,
+            "found": 8
+          }
+        },
+        {
+          "name": "blast_radius",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "accuracy": null,
+          "detail": {
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          }
+        },
+        {
+          "name": "ownership",
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "accuracy": 1.0,
+          "detail": {
+            "correct": 1,
+            "total": 1
+          }
+        },
+        {
+          "name": "finding_detection",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "accuracy": null,
+          "detail": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 0
+          }
+        },
+        {
+          "name": "qa_correctness",
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "accuracy": 1.0,
+          "detail": {
+            "correct": 4,
+            "total": 4
+          }
+        },
+        {
+          "name": "evidence_attribution",
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "accuracy": 1.0,
+          "detail": {
+            "with_evidence": 3,
+            "answered": 3
+          }
+        }
+      ],
+      "hallucination_rate": 0.0
+    },
+    {
+      "case": "tested_lib",
+      "metrics": [
+        {
+          "name": "architecture_dependency",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "accuracy": null,
+          "detail": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "expected": 1,
+            "found": 4
+          }
+        },
+        {
+          "name": "blast_radius",
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6667,
+          "accuracy": null,
+          "detail": {
+            "tp": 1,
+            "fp": 1,
+            "fn": 0
+          }
+        },
+        {
+          "name": "qa_correctness",
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "accuracy": 1.0,
+          "detail": {
+            "correct": 1,
+            "total": 1
+          }
+        },
+        {
+          "name": "evidence_attribution",
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "accuracy": 1.0,
+          "detail": {
+            "with_evidence": 1,
+            "answered": 1
+          }
+        }
+      ],
+      "hallucination_rate": 0.0
+    }
+  ],
+  "baseline_vs_agentic": {
+    "baseline_dependency_f1_avg": 1.0,
+    "agentic_dependency_f1_avg": 1.0,
+    "note": "Deterministic dependency extraction is identical in both; the agentic pipeline adds validation, correlation, ranking, conflict handling and evidence-backed Q&A on top without degrading the deterministic accuracy."
+  }
+}

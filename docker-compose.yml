@@ -1,0 +1,88 @@
+# Local development infrastructure for RepoSage (task 0.2).
+# A single pgvector-enabled Postgres image serves BOTH the relational
+# system-of-record and the pgvector semantic index (design.md section 7).
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: reposage
+      POSTGRES_PASSWORD: reposage
+      POSTGRES_DB: reposage
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reposage -d reposage"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: neo4j/reposage
+      NEO4J_PLUGINS: '["apoc"]'
+    ports:
+      - "7474:7474"   # HTTP browser
+      - "7687:7687"   # Bolt
+    volumes:
+      - neo4jdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      REPOSAGE_DATABASE_URL: postgresql+psycopg://reposage:reposage@postgres:5432/reposage
+      REPOSAGE_REDIS_URL: redis://redis:6379/0
+      REPOSAGE_NEO4J_URI: bolt://neo4j:7687
+      REPOSAGE_NEO4J_USER: neo4j
+      REPOSAGE_NEO4J_PASSWORD: reposage
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: ["python", "-m", "app.worker"]
+    environment:
+      REPOSAGE_DATABASE_URL: postgresql+psycopg://reposage:reposage@postgres:5432/reposage
+      REPOSAGE_REDIS_URL: redis://redis:6379/0
+      REPOSAGE_NEO4J_URI: bolt://neo4j:7687
+      REPOSAGE_NEO4J_USER: neo4j
+      REPOSAGE_NEO4J_PASSWORD: reposage
+    volumes:
+      # Worker launches sandbox containers via the host Docker daemon.
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - redis
+      - postgres
+
+volumes:
+  pgdata:
+  neo4jdata:

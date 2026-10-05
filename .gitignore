@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Env / secrets
+.env
+backend/.env
+
+# RepoSage runtime working dirs
+.reposage/
+backend/.reposage/
+
+# Node / frontend (later phases)
+node_modules/
+dist/
+
+# OS
+.DS_Store

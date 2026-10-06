@@ -3,7 +3,9 @@
 *Day-of skim. Full detail in [INTERVIEW.md](./INTERVIEW.md), diagrams in [ARCHITECTURE.md](./ARCHITECTURE.md).*
 
 ## 30-sec pitch
-Multi-agent **codebase onboarding + tech-debt copilot**. Point it at a Python repo → get a living **onboarding guide** + **tech-debt report** + an interactive **copilot**. Core principle: **evidence-driven, not prompt-driven** — deterministic analyzers gather facts, agents turn them into structured findings with provenance, important ones are validated, debt is scored deterministically, and only then is prose synthesized (claims trace to evidence or are labeled inference). Untrusted repo code runs only in a locked-down Docker sandbox.
+Multi-agent **codebase onboarding + tech-debt copilot**. Point it at a Python repo → get a living **onboarding guide** + **tech-debt report** + an interactive **copilot**. Core principle: **evidence-driven, not prompt-driven** — deterministic analyzers gather facts, agents turn them into structured findings with provenance, important ones are validated, debt is scored deterministically, and synthesis assembles the output (claims trace to evidence or are labeled inference). Untrusted repo code runs only in a locked-down Docker sandbox.
+
+**Positioning:** *evidence-first, LLM-optional agentic system.* The AI is the orchestration (planning manager, parallel specialists, validation/conflict/retry/resume) + classical AI (PageRank centrality, graph-traversal reasoning, vector retrieval). Runs fully today with **no LLM**; the LLM is a decoupled prose-rendering seam that can never be the source of truth.
 
 ## Stack (what + why)
 - **LangGraph** — stateful, resumable agent graph (parallel fan-out, conditional skip, checkpoint resume).
@@ -16,8 +18,8 @@ Multi-agent **codebase onboarding + tech-debt copilot**. Point it at a Python re
 ## Agents / nodes
 `ingest → manager → [architecture ‖ dependency ‖ git_history] → coverage(sandbox) → normalize → reason → synthesis → persist`
 - **Manager** = *bounded* planner (fixed workflow set, enable/skip + reason) — NOT autonomous.
-- **Deterministic** (no LLM): architecture, dependency, git, coverage, normalize, reason (validate→conflict→score→correlate), query routing.
-- **LLM-capable**: synthesis prose + copilot answer rendering (constrained to retrieved evidence only).
+- **Deterministic** (no LLM): architecture, dependency, git, coverage, normalize, reason (validate→conflict→score→correlate), query routing, synthesis assembly, copilot answering. **Runs fully with no LLM / no API key today.**
+- **LLM = optional seam (not wired):** rendering the structured synthesis + copilot output into fluent prose, constrained to retrieved evidence. Decoupled by design so the LLM is never the source of truth.
 
 ## State
 `RunState` = TypedDict. Append-only channels (findings/metrics/errors/conflicts) use `operator.add` reducers → parallel nodes merge, don't clobber → partial results survive a failure.
@@ -55,6 +57,8 @@ Tech-debt signals: centrality · churn · lines_changed · coverage · dependenc
 Offline fixtures with known ground truth → precision/recall/F1, blast-radius, ownership, finding detection, evidence attribution, Q&A correctness, **hallucination rate**. Compares **deterministic baseline vs full pipeline**; results persisted for regression.
 
 ## Top Q&A one-liners
+- **AI without an LLM?** AI = agentic orchestration (planning/validation/conflict/retry/resume) + classical AI (centrality, graph traversal, retrieval). Deterministic-first by design; LLM is an optional, decoupled prose seam — not the source of truth.
+- **Copilot without an LLM?** Analysis is pre-computed; per question it's `route → retrieve → format`: graph questions are computed via traversal, ownership from mined report, open-ended via vector similarity — then templated with citations. More reliable than an LLM for structured Qs; templated not conversational.
 - **Why multi-agent not one prompt?** Different tool surfaces/failure modes; parallel, isolated failures, deterministic where possible, resumable, observable.
 - **Anti-hallucination?** Evidence-or-inference findings → validation disputes unsupported ones → synthesis/copilot use only retrieved evidence; score is deterministic.
 - **Resume?** LangGraph checkpointer replays from last completed node.

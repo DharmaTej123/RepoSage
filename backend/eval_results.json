@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-24T06:17:19.993029+00:00",
+  "generated_at": "2026-10-06T05:58:41.910903+00:00",
   "cases": [
     {
       "case": "layered_app",
@@ -97,13 +97,13 @@
         },
         {
           "name": "blast_radius",
-          "precision": 0.5,
+          "precision": 1.0,
           "recall": 1.0,
-          "f1": 0.6667,
+          "f1": 1.0,
           "accuracy": null,
           "detail": {
-            "tp": 1,
-            "fp": 1,
+            "tp": 2,
+            "fp": 0,
             "fn": 0
           }
         },
